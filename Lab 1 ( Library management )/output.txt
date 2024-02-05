@@ -1,0 +1,77 @@
+SQL> SELECT * FROM PUBLISHER;
+
+NAME                 ADDRESS                   PHONE
+-------------------- -------------------- ----------
+Pearson              London               9999999999
+TataMcGraw           NewYork              8888888888
+Oxford               UK                   7777777777
+OReilly              UK                   6666666666
+
+SQL> SELECT * FROM BOOK;
+
+BOOK_ID                                  TITLE                                    PUBLISHER_NAME
+---------------------------------------- ---------------------------------------- --------------
+B106                                     Hadoop                                   Pearson       
+B104                                     ATC                                      Oxford        
+B101                                     DBMS                                     Pearson       
+B102                                     AIML                                     TataMcGraw    
+B103                                     DCN                                      Pearson       
+B105                                     Python                                   OReilly       
+
+6 rows selected.
+
+SQL> SELECT * FROM BOOK_AUTHORS;
+
+BOOK_ID              AUTHOR_NAME
+-------------------- --------------------
+B101                 Elmarsi
+B101                 Navathe
+B101                 Ramakrishnan
+B102                 Elaine
+B105                 Srinivasan
+B106                 Douglas
+
+6 rows selected.
+
+SQL> SELECT * FROM LIBARY_PROGRAMME;
+
+PROGRAMME_ID         PROGRAMME_NAME       ADDRESS
+-------------------- -------------------- --------------------
+L1                   SAHYADRI             MANGALORE
+L2                   SAPNA                MANGALORE
+L3                   SANKALP              BANGALORE
+L4                   PENGUIN              CHENNAI
+L5                   AGNES                CHENNAI
+
+SQL> SELECT * FROM BOOK_COPIES;
+
+BOOK_ID              PROGRAMME_ID         NO_OF_COPIES
+-------------------- -------------------- ------------
+B101                 L1                             99
+B102                 L1                             99
+B102                 L2                             99
+B103                 L1                             99
+
+SQL> SELECT * FROM BOOK_LENDING;
+
+BOOK_ID              PROGRAMME_ID         CARD_NO              DATE_OUT  DUE_DATE
+-------------------- -------------------- -------------------- --------- ---------
+B101                 L1                   FA101                02-JAN-21 09-JAN-21
+B101                 L1                   FA102                02-MAR-23 09-MAR-23
+B102                 L1                   FA102                02-MAR-23 09-MAR-23
+B101                 L2                   FA102                02-MAR-23 09-MAR-23
+B101                 L1                   S103                 04-APR-22 30-JUN-22
+
+======================================================================================================================================================================
+
+SQL> SELECT B.BOOK_ID,TITLE,PUBLISHER_NAME,AUTHOR_NAME,NO_OF_COPIES FROM BOOK B, BOOK_AUTHORS A, BOOK_COPIES BC
+  2  WHERE B.BOOK_ID = BC.BOOK_ID AND B.BOOK_ID = A.BOOK_ID;
+
+BOOK_ID                                  TITLE                                    PUBLISHER_NAME       AUTHOR_NAME          NO_OF_COPIES
+---------------------------------------- ---------------------------------------- ------------------  --------------       -------------
+B101                                     DBMS                                     Pearson              Elmarsi                        99
+B101                                     DBMS                                     Pearson              Navathe                        99
+B101                                     DBMS                                     Pearson              Ramakrishnan                   99
+B102                                     AIML                                     TataMcGraw           Elaine                         99
+B102                                     AIML                                     TataMcGraw           Elaine                         99
+
