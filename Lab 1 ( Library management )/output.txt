@@ -75,3 +75,44 @@ B101                                     DBMS                                   
 B102                                     AIML                                     TataMcGraw           Elaine                         99
 B102                                     AIML                                     TataMcGraw           Elaine                         99
 
+SQL> SELECT CARD_NO FROM BOOK_LENDING
+  2  WHERE DATE_OUT
+  3  BETWEEN '01-JAN-2023' AND '30-JUN-2023'
+  4  GROUP BY CARD_NO HAVING COUNT(*)>=3;
+
+CARD_NO
+--------------------
+FA102
+
+SQL> DELETE FROM BOOK WHERE BOOK_ID=&bid;
+Enter value for bid: 'B103'
+old   1: DELETE FROM BOOK WHERE BOOK_ID=&bid
+new   1: DELETE FROM BOOK WHERE BOOK_ID='B103'
+
+1 row deleted.
+
+
+SQL> SELECT * FROM BOOK1 PARTITION(P1);
+
+BOOK_ID                                  TITLE                                    PUBLISHER_NAME         PUB_YEAR
+---------------------------------------- ---------------------------------------- ------------------
+B106                                     Hadoop                                   Pearson                    2000
+
+SQL> SELECT * FROM BOOK1 PARTITION(P2);
+
+no rows selected
+
+SQL> SELECT * FROM BOOK1 PARTITION(P3);
+
+BOOK_ID                                  TITLE                                    PUBLISHER_NAME         PUB_YEAR
+---------------------------------------- ---------------------------------------- ------------------
+B102                                     AIML                                     TataMcGraw                 2009
+
+SQL> SELECT * FROM BOOK1 PARTITION(P4);
+
+BOOK_ID                                  TITLE                                    PUBLISHER_NAME         PUB_YEAR
+---------------------------------------- ---------------------------------------- ------------------
+B101                                     DBMS                                     Pearson                    2017
+B103                                     DCN                                      Pearson                    2017
+B104                                     ATC                                      Oxford                     2017
+B105                                     Python                                   OReilly                    2014
