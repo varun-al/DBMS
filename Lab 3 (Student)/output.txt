@@ -1,0 +1,21 @@
+Query 1:
+SQL> SELECT A.*,B.SEM,B.SECTION FROM STUDENT A, SEMSEC B, CLASS C 
+  2  WHERE  A.USN=C.USN AND B.SSID=C.SSID
+  3  AND B.SEM=4 AND B.SECTION ='C';
+
+USN                  SNAME      ADDRESS         PHONE GENDER            SEM S
+-------------------- ---------- ---------- ---------- ---------- ---------- -
+4SF20CS088           KAVYA      MANGALORE   876514067 FEMALE              4 C
+
+=========================================================================================================
+Query 2:
+SQL> SELECT SEM,SECTION,GENDER,COUNT(*) FROM STUDENT S,SEMSEC SL,CLASS C 
+  2  WHERE S.USN =C.USN AND SL.SSID=C.SSID GROUP BY (GENDER,SEM,SECTION)ORDER BY (SEM);
+
+       SEM S GENDER       COUNT(*)
+---------- - ---------- ----------
+         4 A FEMALE              1
+         4 C FEMALE              1
+         8 B FEMALE              1
+         8 A MALE                1
+         8 C MALE                1
