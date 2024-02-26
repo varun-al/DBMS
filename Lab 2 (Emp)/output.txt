@@ -1,0 +1,62 @@
+Query 1:
+SQL> SELECT PNO FROM WORKSON
+  2  WHERE EID IN (SELECT EID FROM EMPLOYEE WHERE NAME='RAHUL')
+  3  UNION 
+  4  SELECT PNUM FROM PROJECT
+  5  WHERE DNO IN (SELECT DNUM FROM DEPARTMENT WHERE DMGR_ID IN (SELECT EID FROM EMPLOYEE WHERE NAME ='RAHUL'));
+
+       PNO
+----------
+         1
+         2
+         4
+         5
+
+=============================================================================================================
+Query 2:
+SQL> SELECT EID, NAME , SALRY,SALRY+0.1*SALRY  AS UPDATED_SALARY
+  2  FROM EMPLOYEE WHERE EID IN
+  3  (SELECT EID FROM WORKSON WHERE PNO IN (SELECT PNUM FROM PROJECT WHERE PNAME='IOT'));
+
+       EID NAME                      SALRY UPDATED_SALARY
+---------- -------------------- ---------- --------------
+         1 RAHUL                     35000          38500
+         2 SAHANA                    35000          38500
+
+=============================================================================================================
+Query 3:
+SQL> SELECT SUM(SALRY),AVG(SALRY),MAX(SALRY),MIN(SALRY)
+  2  FROM EMPLOYEE E, DEPARTMENT D
+  3  WHERE D.Dnum=E.Dno AND Dname='ACCOUNT';
+
+SUM(SALRY) AVG(SALRY) MAX(SALRY) MIN(SALRY)
+---------- ---------- ---------- ----------
+    670000 223333.333     600000      35000
+
+=============================================================================================================
+Query 4:
+SQL> SELECT Eid ,NAME FROM EMPLOYEE E WHERE NOT EXISTS(
+  2  (SELECT PNUM FROM PROJECT WHERE Dno=5) MINUS
+  3  (SELECT Pno FROM WORKSON W WHERE W.Eid=E.Eid));
+
+       EID NAME
+---------- --------------------
+         5 SAJAAN
+
+=============================================================================================================
+Query 5:
+SQL> CREATE VIEW DEPTINFO (NAME,COUNT_EMP,SUM_SAL)AS
+  2  SELECT D.DNAME, COUNT(*),SUM(SALRY)
+  3  FROM DEPARTMENT D INNER JOIN EMPLOYEE E
+  4  ON E.DNO = D.DNUM
+  5  GROUP BY D.DNAME;
+
+View created.
+
+SQL> SELECT * FROM DEPTINFO;
+
+NAME        COUNT_EMP    SUM_SAL
+---------- ---------- ----------
+ISE                 1      35000
+ACCOUNT             3     670000
+CSE                 1      35000
