@@ -116,3 +116,9 @@ B101                                     DBMS                                   
 B103                                     DCN                                      Pearson                    2017
 B104                                     ATC                                      Oxford                     2017
 B105                                     Python                                   OReilly                    2014
+
+SQL> SELECT * FROM AVALIABLE_BOOK;
+
+BOOK_ID                                  TITLE                                    BOOKS_AVALIABLE
+---------------------------------------- ---------------------------------------- ---------------
+B101                                     DBMS                                                  95
