@@ -1,0 +1,271 @@
+
+SQL> CREATE TABLE employee(
+  2  Eid INT PRIMARY KEY,
+  3  name VARCHAR2(20),
+  4  address VARCHAR2(20),
+  5  Gender CHAR(1) CHECK(Gender ='M' OR Gender ='F'),
+  6  salary NUMBER(6),
+  7  SuperEid REFERENCES EMPLOYEE(Eid),
+  8  dno NUMBER);
+
+Table created.
+SQL> INSERT INTO employee VALUES(1, 'Rahul' , 'Mangaluru', 'M',35000,1,NULL);
+
+1 row created.
+
+SQL> INSERT INTO employee VALUES(2, 'Sahana', 'Mangaluru', 'F',35000,1,NULL);
+
+1 row created.
+
+SQL> INSERT INTO employee VALUES(3, 'Sagar', 'Bengaluru', 'M',35000,1,NULL);
+
+1 row created.
+
+SQL> INSERT INTO employee VALUES(4, 'Sagarik', 'Mangaluru', 'M',35000,1,NULL);
+
+1 row created.
+
+SQL> INSERT INTO employee VALUES(5, 'Sajaan', 'Mysore', 'M',600000,1,NULL);
+
+SQL> CREATE TABLE department (
+  2  Dnum NUMBER(5) PRIMARY KEY,
+  3  dname VARCHAR2(10) ,
+  4  Dmgr_id REFERENCES employee(Eid),
+  5  Mgr_start_date date);
+
+Table created.
+
+SQL> INSERT INTO department VALUES(1,'CSE',1,'2-Nov-2007');
+
+1 row created.
+
+SQL> INSERT INTO department VALUES(2,'IOT',2,'2-Nov-2007');
+
+1 row created.
+
+SQL> INSERT INTO department VALUES(3,'Account',2,'2-Nov-2017');
+
+1 row created.
+
+SQL> INSERT INTO department VALUES(4,'ISE',1,'2-Nov-2000');
+
+1 row created.
+
+SQL> INSERT INTO department VALUES(5,'Finance',1,'3-Nov-2001');
+
+1 row created.
+
+ALTER TABLE employee ADD CONSTRAINT fk FOREIGN KEY(dno) REFERENCES 
+department(Dnum);
+
+Table altered.
+
+UPDATE employee 
+    SET dno=4
+  where eid=1;
+
+UPDATE employee 
+    SET dno=1
+  where eid=2;
+
+UPDATE employee 
+    SET dno=3
+  where eid=3;
+
+UPDATE employee 
+    SET dno=3
+  where eid=4;
+
+UPDATE employee 
+    SET dno=3
+  where eid=5;
+
+
+
+
+
+
+SQL> SELECT * FROM EMPLOYEE;
+
+       EID NAME                 ADDRESS              G     SALARY   SUPEREID        DNO
+---------- -------------------- -------------------- - ---------- ---------- ----------
+         1 Rahul                Mangaluru            M      35000          1          4
+         2 Sahana               Mangaluru            F      35000          1          1
+         3 Sagar                Bengaluru            M      35000          1          3
+         4 Sagarik              Mangaluru            M      35000          1          3
+         5 Sajaan               Mysore               M     600000          1          3
+
+SQL> SELECT * FROM DEPARTMENT;
+
+      DNUM DNAME         DMGR_ID MGR_START
+---------- ---------- ---------- ---------
+         1 CSE                 1 02-NOV-07
+         2 IOT                 2 02-NOV-07
+         3 Account             2 02-NOV-17
+         4 ISE                 1 02-NOV-00
+         5 Finance             1 03-NOV-01
+
+
+
+
+
+
+
+
+
+SQL> CREATE TABLE dlocation 
+  2  (dno REFERENCES department(dnum),  
+  3  location  VARCHAR2(10), 
+  4  PRIMARY KEY(dno,location)); 
+
+Table created.
+SQL> INSERT INTO dlocation VALUES(1,'Mangaluru');
+
+1 row created.
+
+SQL> SELECT * FROM DLOCATION;
+
+       DNO LOCATION
+---------- ----------
+         1 Mangaluru
+         1 Mysore
+         2 Mangaluru
+         3 Bengaluru
+         4 Mangaluru
+         5 Mangaluru
+
+6 rows selected.
+
+SQL> CREATE TABLE project(
+  2  Pnum NUMBER(2) PRIMARY KEY,
+  3  Pname VARCHAR2(20), 
+  4  Plocation VARCHAR2(20), 
+  5  dno NUMBER  REFERENCES    department(dnum)
+  6  );
+
+Table created.
+
+
+SQL> INSERT INTO project VALUES(2,'Data Mining','Managluru',1);
+
+1 row created.
+
+
+SQL> SELECT * FROM PROJECT;
+
+      PNUM PNAME                PLOCATION                   DNO
+---------- -------------------- -------------------- ----------
+         1 IOT                  Managluru                     1
+         2 Data Mining          Managluru                     1
+         3 CC                   Hubli                         3
+         4 Image processing     Managluru                     4
+         5 Research             Managluru                     5
+
+SQL> CREATE TABLE  workson (
+  2  Eid  NUMBER(5) REFERENCES employee(eid),
+  3  Pno  NUMBER(2) REFERENCES   project(Pnum),
+  4  hours NUMBER(5,2), 
+  5  primary key(Eid,Pno));
+
+Table created.
+
+SQL> INSERT INTO workson VALUES(1,1,4);
+
+1 row created.
+
+SQL> SELECT * FROM WORKSON;
+
+       EID        PNO      HOURS
+---------- ---------- ----------
+         1          1          4
+         2          1          5
+         3          2          4
+         4          3          4
+         5          5          4
+
+
+
+CREATE TABLE DEPENDENT(
+EMP_ID INT CONSTRAINT DEP_EMPID_PK PRIMARY KEY, 
+DEPENDENT_NAME VARCHAR2(12),
+GENDER VARCHAR2(5), 
+BDATE DATE, 
+RELATIONSHIP VARCHAR2(12), 
+FOREIGN KEY(EMP_ID)REFERENCES EMPLOYEE(EID) ON DELETE CASCADE
+); 
+
+
+Query 1:
+
+SQL> SELECT pno 
+  2  FROM workson 
+  3  WHERE Eid IN
+  4   (SELECT Eid FROM employee WHERE name='Rahul') 
+  5  UNION 
+  6  SELECT Pnum 
+  7  FROM project 
+  8  WHERE dno IN
+  9   (SELECT Dnum FROM department WHERE DMgr_id IN  
+      (SELECT Eid FROM employee WHERE name='Rahul'));
+
+
+       PNO
+      ------
+         1
+         2
+         4
+         5
+Query 2:
+
+SQL> SELECT Eid,name, salary,salary+0.1*salary as updated_salary 
+  2  FROM employee  
+  3  WHERE Eid IN
+  4   (SELECT Eid FROM workson WHERE pno IN(
+  5    SELECT pnum FROM project WHERE Pname='IOT'));
+
+       EID NAME                     SALARY UPDATED_SALARY
+---------- -------------------- ---------- --------------
+         1 Rahul                     35000          38500
+         2 Sahana                    35000          38500
+
+Query3:
+
+SQL> SELECT SUM(salary), AVG(salary), MAX(salary), MIN(salary)
+  2  FROM employee e,department d
+  3  WHERE d.dnum=e.dno AND dname='Account';
+
+SUM(SALARY) AVG(SALARY) MAX(SALARY) MIN(SALARY)
+----------- ----------- ----------- -----------
+     670000  223333.333      600000       35000
+Query 4:
+
+SQL> SELECT Eid,name 
+  2  FROM employee e 
+  3  WHERE NOT EXISTS(
+  4  (SELECT pnum FROM project WHERE dno=5) MINUS 
+  5  (SELECT pno FROM workson w WHERE w.Eid=e.Eid)
+  6  );
+
+       EID NAME
+---------- --------------------
+         5 Sajaan
+QUERY 5:
+
+SQL> Create view dept_info(name,count_emp,sum_sal) as
+  2  Select d.dname, count(*), sum(salary) 
+  3  From department d inner join employee e
+  4  ON e.Dno = d.Dnum
+  5  Group by d.Dname;
+
+View created.
+
+SQL> SELECT * FROM DEPT_INFO;
+
+NAME        COUNT_EMP    SUM_SAL
+---------- ---------- ----------
+ISE                 1      35000
+Account             3     670000
+CSE                 1      35000
+
+
+

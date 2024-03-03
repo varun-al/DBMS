@@ -1,0 +1,243 @@
+CREATE TABLE PUBLISHER(
+NAME VARCHAR2(20) PRIMARY KEY,
+ADDRESS VARCHAR2(20),
+PHONE NUMBER(10)); 
+
+INSERT INTO PUBLISHER VALUES('Pearson','London',9874522224);
+INSERT INTO PUBLISHER VALUES('TataMcGraw','NewYork',9858523565);
+INSERT INTO PUBLISHER VALUES('Oxford','UK',9885121112);
+INSERT INTO PUBLISHER VALUES('Cambridge','UK',9785634615);
+INSERT INTO PUBLISHER VALUES('OReilly','California',9994125455);
+
+CREATE TABLE BOOK (
+ BOOK_ID VARCHAR2(20) PRIMARY KEY, 
+ TITLE VARCHAR2(40), 
+ PUBLISHER_NAME VARCHAR2(20) references
+ PUBLISHER(NAME) on delete cascade, 
+ PUB_YEAR INT);
+
+INSERT INTO BOOK VALUES ('B101','DBMS','Pearson',2017);
+INSERT INTO BOOK VALUES ('B102','AIML','TataMcGraw',2009);
+INSERT INTO BOOK VALUES ('B103','DCN','Pearson',2017);
+INSERT INTO BOOK VALUES ('B104','ATC','Oxford',2017);
+INSERT INTO BOOK VALUES ('B105','Python','OReilly',2014);
+INSERT INTO BOOK VALUES ('B106','Hadoop','Pearson',2000);
+
+CREATE  TABLE  BOOK_AUTHORS(
+BOOK_ID varchar(20),
+AUTHOR_NAME VARCHAR2(20), 
+PRIMARY KEY(BOOK_ID, AUTHOR_NAME),
+FOREIGN KEY(BOOK_ID) REFERENCES BOOK ON DELETE CASCADE);
+
+INSERT INTO BOOK_AUTHORS VALUES('B101', 'Elmarsi');
+INSERT INTO BOOK_AUTHORS VALUES('B101', 'Navathe');
+INSERT INTO BOOK_AUTHORS VALUES('B101', 'Ramakrishnan');
+INSERT INTO BOOK_AUTHORS VALUES('B106', 'Douglas');
+INSERT INTO BOOK_AUTHORS VALUES('B102', 'Elaine');
+INSERT INTO BOOK_AUTHORS VALUES('B105', 'Srinivasan');
+
+CREATE TABLE LIBRARY_PROGRAMME(
+PROGRAMME_ID VARCHAR(20) PRIMARY_KEY,
+PROGRAMME_NAME VARCHAR(10),
+ADDRESS VARCHAR(20));
+
+
+INSERT INTO LIBRARY_PROGRAMME VALUES ('L1','SAHYADRI','Mangalore');
+INSERT INTO LIBRARY_PROGRAMME VALUES ('L2','SAPNA','Mangalore');
+INSERT INTO LIBRARY_PROGRAMME VALUES ('L3','SANKALP','Bangalore');
+INSERT INTO LIBRARY_PROGRAMME VALUES ('L4','PENGUIN','Chennai');
+INSERT INTO LIBRARY_PROGRAMME VALUES ('L5','AGNES','Chennai');
+
+
+CREATE TABLE BOOK_COPIES(
+ BOOK_ID VARCHAR(20) 
+ REFERENCES BOOK(BOOK_ID) 
+ ON DELETE CASCADE,
+ PROGRAMME_ID VARCHAR(20) 
+ REFERENCES 
+ LIBRARY_PROGRAMME(PROGRAMME_ID) 
+ ON DELETE CASCADE,
+ NO_OF_COPIES NUMBER(2),
+ primary key(BOOK_ID, PROGRAMME_ID));
+
+
+INSERT INTO BOOK_COPIES VALUES ('B101','L1',99);
+INSERT INTO BOOK_COPIES VALUES ('B102','L1',99);
+INSERT INTO BOOK_COPIES VALUES ('B103','L2',99);
+INSERT INTO BOOK_COPIES VALUES ('B103','L1',99);
+
+CREATE TABLE  BOOK_LENDING(
+BOOK_ID VARCHAR(20),
+PROGRAMME_ID VARCHAR(20),
+CARD_NO VARCHAR(20),
+DATE_OUT DATE,
+DUE_DATE DATE, 
+PRIMARY KEY(PROGRAMME_ID, BOOK_ID, CARD_NO),
+FOREIGN KEY(BOOK_ID) 
+REFERENCES book(BOOK_ID) ON DELETE CASCADE,
+FOREIGN KEY(PROGRAMME_ID)
+REFERENCES LIBRARY_PROGRAMME(PROGRAMME_ID) ON DELETE CASCADE,
+CONSTRAINT CK1 CHECK (DUE_DATE > DUE_DATE));
+
+INSERT INTO BOOK_LENDING VALUES('B101','L1','FA101','02-JAN-21','09-JAN-21');
+INSERT INTO BOOK_LENDING VALUES('B101','L1','FA102','02-MAR-23','09-MAR-23');
+INSERT INTO BOOK_LENDING VALUES('B102','L1','FA102','02-MAR-23','09-MAR-23');
+INSERT INTO BOOK_LENDING VALUES('B101','L2','FA102','02-MAR-23','09-MAR-23');
+INSERT INTO BOOK_LENDING VALUES('B101','L1','S103','04-APR-22','30-JUN-22');
+
+ SELECT * FROM PUBLISHER;
+
+NAME                 ADDRESS                   PHONE
+-------------------- -------------------- ----------
+Pearson              London               9874522224
+TataMcGraw           NewYork              9858523565
+Oxford               UK                   9885121112
+Cambridge            UK                   9785634615
+OReilly              California           9994125455
+
+SELECT * FROM BOOK;
+
+BOOK_ID              TITLE                                    PUBLISHER_NAME         PUB_YEAR
+-------------------- ---------------------------------------- -------------------- ----------
+B101                 DBMS                                     Pearson                    2017
+B102                 AIML                                     TataMcGraw                 2009
+B103                 DCN                                      Pearson                    2017
+B104                 ATC                                      Oxford                     2017
+B105                 Python                                   OReilly                    2014
+B106                 Hadoop                                   Pearson                    2000
+
+SQL> SELECT * FROM BOOK_AUTHORS;
+
+BOOK_ID              AUTHOR_NAME
+-------------------- --------------------
+B101                 Elmarsi
+B101                 Navathe
+B101                 Ramakrishnan
+B102                 Elaine
+B105                 Srinivasan
+B106                 Douglas
+
+SQL> SELECT * FROM LIBRARY_PROGRAMME;
+
+PROGRAMME_ID         PROGRAMME_ ADDRESS
+-------------------- ---------- --------------------
+L1                   SAHYADRI   Mangalore
+L2                   SAPNA      Mangalore
+L3                   SANKALP    Bangalore
+L4                   PENGUIN    Chennai
+L5                   AGNES      Chennai
+
+SQL>  SELECT * FROM BOOK_COPIES;
+
+BOOK_ID              PROGRAMME_ID         NO_OF_COPIES
+-------------------- -------------------- ------------
+B101                 L1                             99
+B102                 L1                             99
+B103                 L2                             99
+B103                 L1                             99
+
+SQL> SELECT * FROM BOOK_LENDING;
+
+BOOK_ID              PROGRAMME_ID         CARD_NO              DATE_OUT  DUE_DATE
+-------------------- -------------------- -------------------- --------- ---------
+B101                 L1                   FA101                02-JAN-21 09-JAN-21
+B101                 L1                   FA102                02-MAR-23 09-MAR-23
+B102                 L1                   FA102                02-MAR-23 09-MAR-23 
+B101                 L2                   FA102                02-MAR-23 09-MAR-23
+B101                 L1                   S103                 04-APR-22 30-JUN-22
+
+QUERY 1:
+SELECT b.book_id, lp.programme_id, 
+ b.title, b.publisher_name, bc.no_of_copies, 
+ a.author_name 
+ FROM book b, book_authors a, book_copies bc,
+ library_programme lp 
+ WHERE b.book_id = a.book_id AND 
+ b.book_id = bc.book_id AND 
+ bc.programme_id = lp.programme_id;
+
+OR
+
+select b.book_id, title, publisher_name,author_name, no_of_copies
+ from book b, book_authors a, book_copies bc
+ where b.book_id = bc.book_id AND 
+ b.book_id = a.book_id;
+
+BOOK_ID              TITLE                                    PUBLISHER_NAME       AUTHOR_NAME          NO_OF_COPIES
+-------------------- ---------------------------------------- -------------------- -----------------
+B101                 DBMS                                     Pearson              Elmarsi                        99
+B101                 DBMS                                     Pearson              Navathe                        99
+B101                 DBMS                                     Pearson              Ramakrishnan                   99
+B102                 AIML                                     TataMcGraw           Elaine                         99
+
+QUERY 2:
+
+SQL> SELECT card_no  FROM book_lending 
+  2   WHERE date_out 
+  3   BETWEEN '01-JAN-2023' 
+  4   AND '30-JUN-2023' 
+  5   GROUP BY card_no 
+  6   HAVING COUNT(*) >= 3 ;
+
+CARD_NO
+--------------------
+FA102
+
+QUERY 3:
+
+Delete a book in BOOK table. Update the contents 
+of other tables to reflect this data manipulation operation.
+
+DELETE FROM book WHERE book_id = &bid;
+
+Enter : 'B103';
+
+
+QUERY 4:
+
+CREATE TABLE BOOK1 (
+ BOOK_ID VARCHAR2(20) PRIMARY KEY, 
+ TITLE VARCHAR2(40), 
+ PUBLISHER_NAME VARCHAR2(20) references
+ PUBLISHER(NAME) on delete cascade, 
+ PUB_YEAR INT)
+ PARTITION BY RANGE(pub_year)
+ (PARTITION p1 VALUES LESS THAN(2001),
+  PARTITION p2 VALUES LESS THAN(2005),
+  PARTITION P3 VALUES LESS THAN (2010),
+   PARTITION P4 VALUES LESS THAN(MAXVALUE));
+
+
+INSERT INTO BOOK1 VALUES ('B101','DBMS','Pearson',2017);
+INSERT INTO BOOK1 VALUES ('B102','AIML','TataMcGraw',2009);
+INSERT INTO BOOK1 VALUES ('B103','DCN','Pearson',2017);
+INSERT INTO BOOK1 VALUES ('B104','ATC','Oxford',2017);
+INSERT INTO BOOK1 VALUES ('B105','Python','OReilly',2014);
+INSERT INTO BOOK1 VALUES ('B106','Hadoop','Pearson',2000);
+
+SQL> SELECT * FROM BOOK1 PARTITION(P1);
+
+BOOK_ID              TITLE                                    PUBLISHER_NAME         PUB_YEAR
+-------------------- ---------------------------------------- -------------------- ----------
+B106                 Hadoop                                   Pearson                    2000
+
+
+QUERY 5:
+
+SQL> Create view available_book
+  2  As
+  3   Select b.book_id, b.title, 
+  4  sum(bc.no_of_copies)- (select count(*) from book_lending  bl where bl.book_id= b. book_id  grou
+p by bl.book_id) as books_available  from book b, book_copies  bc where b.book_id=bc.book_id group b
+y b.book_id,b.title;
+
+SQL>  SELECT * FROM AVAILABLE_BOOK;
+
+BOOK_ID              TITLE                                    BOOKS_AVAILABLE
+-------------------- ---------------------------------------- ---------------
+B101                 DBMS                                                  95
+B102                 AIML                                                  98
+B103                 DCN
+
+
+
